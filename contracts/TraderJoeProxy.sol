@@ -81,8 +81,9 @@ interface traderJoePool {
         external
         view
         returns (
-            uint256 pendingAvao,
+            uint256 pendingJoe,
             address bonusTokenAddress,
+            string memory bonusTokenSymbol,
             uint256 pendingBonusToken
         );
     function emergencyWithdraw(uint256 _pid) external;
@@ -146,7 +147,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     }
     
     function pendingRewards() external view returns (uint256) {
-        (uint256 pendingReward,,) = targetPool.pendingTokens(targetPoolId, address(this));
+        (uint256 pendingReward,,,) = targetPool.pendingTokens(targetPoolId, address(this));
         return pendingReward;
     }
     
