@@ -28,7 +28,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     uint256 public totalStaked;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
-    mapping(address => uint256) public rewards; // Rewarded AVME balances for each user
+    mapping(address => uint256) public rewards;
 
     uint256 private _totalSupply; // Total LP currently in pool
     mapping(address => uint256) private _balances;  // LP balances for each user
@@ -61,6 +61,11 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     }
 
     function getRewardForDuration() external view returns (uint256) { return rewardRate.mul(rewardsDuration); }
+
+    function get24HRewardForPool() external view returns (uint256) {
+        uint256 accumulativeRewards = rewardRate.mul(86400);
+        return accumulativeRewards;
+    }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
@@ -139,5 +144,4 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     event RewardsDurationUpdated(uint256 newDuration);
     event Recovered(address token, uint256 amount);
 }
-
 
