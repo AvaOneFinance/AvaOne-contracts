@@ -1,5 +1,14 @@
 pragma solidity ^0.5.16;
 
+
+// Use this when deploying with REMIX
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/math/Math.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/math/SafeMath.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/ownership/Ownable.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/token/ERC20/ERC20Detailed.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/token/ERC20/SafeERC20.sol";
+// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/utils/ReentrancyGuard.sol";
+
 import "./OpenZeppelin/v2.4.0/contracts/math/Math.sol";
 import "./OpenZeppelin/v2.4.0/contracts/math/SafeMath.sol";
 import "./OpenZeppelin/v2.4.0/contracts/ownership/Ownable.sol";
