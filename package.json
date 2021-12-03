@@ -1,0 +1,31 @@
+{
+  "name": "avaone-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://hashercat: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@github.com/AvaOneFinance/AvaOne-contracts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AvaOneFinance/AvaOne-contracts/issues"
+  },
+  "homepage": "https://github.com/AvaOneFinance/AvaOne-contracts#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.2",
+    "hardhat": "^2.7.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.0",
+    "openzeppelin-solidity": "github:OpenZeppelin/openzeppelin-contracts"
+  }
+}
