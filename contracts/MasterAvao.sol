@@ -1721,18 +1721,10 @@ contract MasterChefAvaoV2 is Ownable {
     AvaOne public avao;
     // Dev address.
     address public devAddr;
-    // Treasury address.
-    address public treasuryAddr;
-    // Investor address
-    address public investorAddr;
     // AVAO tokens created per second.
     uint256 public avaoPerSec;
     // Percentage of pool rewards that goto the devs.
     uint256 public devPercent;
-    // Percentage of pool rewards that goes to the treasury.
-    uint256 public treasuryPercent;
-    // Percentage of pool rewards that goes to the investor.
-    uint256 public investorPercent;
     // Whitelisted contracts that are able to interact with this contract
     mapping(address => bool) public whitelisted;
 
@@ -1777,39 +1769,19 @@ contract MasterChefAvaoV2 is Ownable {
     constructor(
         AvaOne _avao,
         address _devAddr,
-        address _treasuryAddr,
-        address _investorAddr,
         uint256 _avaoPerSec,
         uint256 _startTimestamp,
-        uint256 _devPercent,
-        uint256 _treasuryPercent,
-        uint256 _investorPercent
+        uint256 _devPercent
     ) public {
         require(
             0 <= _devPercent && _devPercent <= 1000,
             "constructor: invalid dev percent value"
         );
-        require(
-            0 <= _treasuryPercent && _treasuryPercent <= 1000,
-            "constructor: invalid treasury percent value"
-        );
-        require(
-            0 <= _investorPercent && _investorPercent <= 1000,
-            "constructor: invalid investor percent value"
-        );
-        require(
-            _devPercent + _treasuryPercent + _investorPercent <= 1000,
-            "constructor: total percent over max"
-        );
         avao = _avao;
         devAddr = _devAddr;
-        treasuryAddr = _treasuryAddr;
-        investorAddr = _investorAddr;
         avaoPerSec = _avaoPerSec;
         startTimestamp = _startTimestamp;
         devPercent = _devPercent;
-        treasuryPercent = _treasuryPercent;
-        investorPercent = _investorPercent;
         totalAllocPoint = 0;
     }
 
@@ -1877,9 +1849,7 @@ contract MasterChefAvaoV2 is Ownable {
         if (block.timestamp > pool.lastRewardTimestamp && pool.lpSupply != 0) {
             uint256 multiplier = block.timestamp.sub(pool.lastRewardTimestamp);
             uint256 lpPercent = 1000 -
-                devPercent -
-                treasuryPercent -
-                investorPercent;
+                devPercent;
             uint256 avaoReward = multiplier
             .mul(avaoPerSec)
             .mul(pool.allocPoint)
@@ -1952,13 +1922,9 @@ contract MasterChefAvaoV2 is Ownable {
         uint256 avaoReward = multiplier.mul(avaoPerSec).mul(pool.allocPoint).div(
             totalAllocPoint
         );
-        uint256 lpPercent = 1000 -
-            devPercent -
-            treasuryPercent -
-            investorPercent;
+        uint256 lpPercent = 1000 - devPercent;
+
         avao.mint(devAddr, avaoReward.mul(devPercent).div(1000));
-        avao.mint(treasuryAddr, avaoReward.mul(treasuryPercent).div(1000));
-        avao.mint(investorAddr, avaoReward.mul(investorPercent).div(1000));
         avao.mint(address(this), avaoReward.mul(lpPercent).div(1000));
         pool.accAvaoPerShare = pool.accAvaoPerShare.add(
             avaoReward.mul(1e12).div(pool.lpSupply).mul(lpPercent).div(1000)
@@ -2096,46 +2062,10 @@ contract MasterChefAvaoV2 is Ownable {
             "setDevPercent: invalid percent value"
         );
         require(
-            treasuryPercent + _newDevPercent + investorPercent <= 1000,
+            _newDevPercent  <= 1000,
             "setDevPercent: total percent over max"
         );
         devPercent = _newDevPercent;
-    }
-
-    // Update treasury address by the previous treasury.
-    function setTreasuryAddr(address _treasuryAddr) public {
-        require(msg.sender == treasuryAddr, "setTreasuryAddr: wut?");
-        treasuryAddr = _treasuryAddr;
-    }
-
-    function setTreasuryPercent(uint256 _newTreasuryPercent) public onlyOwner {
-        require(
-            0 <= _newTreasuryPercent && _newTreasuryPercent <= 1000,
-            "setTreasuryPercent: invalid percent value"
-        );
-        require(
-            devPercent + _newTreasuryPercent + investorPercent <= 1000,
-            "setTreasuryPercent: total percent over max"
-        );
-        treasuryPercent = _newTreasuryPercent;
-    }
-
-    // Update the investor address by the previous investor.
-    function setInvestorAddr(address _investorAddr) public {
-        require(msg.sender == investorAddr, "setInvestorAddr: wut?");
-        investorAddr = _investorAddr;
-    }
-
-    function setInvestorPercent(uint256 _newInvestorPercent) public onlyOwner {
-        require(
-            0 <= _newInvestorPercent && _newInvestorPercent <= 1000,
-            "setInvestorPercent: invalid percent value"
-        );
-        require(
-            devPercent + _newInvestorPercent + treasuryPercent <= 1000,
-            "setInvestorPercent: total percent over max"
-        );
-        investorPercent = _newInvestorPercent;
     }
 
     // Add a contract address to whitelist
