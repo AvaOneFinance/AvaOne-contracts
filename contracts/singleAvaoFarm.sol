@@ -38,6 +38,8 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
+    mapping(address => bool) public whitelisted;
+
     uint256 private _totalSupply; // Total LP currently in pool
     mapping(address => uint256) private _balances;  // LP balances for each user
 
@@ -78,6 +80,8 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function stake(uint256 amount) external nonReentrant notPaused updateReward(msg.sender) {
+        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+                "Sender is a contract and it is not allowed to interact with this contract");
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
@@ -86,6 +90,8 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
+        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+                "Sender is a contract and it is not allowed to interact with this contract");
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
@@ -127,6 +133,17 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
+
+    // Add a contract address to whitelist
+    function addToWhitelist(address _address) public onlyOwner {
+        whitelisted[_address] = true;
+    }
+
+    // Remove a contract address from whitelist
+    function removeFromWhitelist(address _address) public onlyOwner {
+        whitelisted[_address] = false;
+    }
+
 
     /* ========== MODIFIERS ========== */
 
