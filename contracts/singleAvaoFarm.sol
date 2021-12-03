@@ -34,7 +34,6 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     uint256 public rewardsDuration = 7 days;  // Time interval during which rewards will be distributed
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
-    uint256 public totalStaked;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -83,7 +82,6 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
-        totalStaked = totalStaked.add(amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -92,7 +90,6 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
         stakingToken.safeTransfer(msg.sender, amount);
-        totalStaked = totalStaked.sub(amount);
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -114,7 +111,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     function addRewardToPool(uint256 reward) external updateReward(address(0)) {
         require(reward > 0, "Cannot add 0 to reward");
         rewardsToken.safeTransferFrom(address(msg.sender), address(this), reward);
-        uint freeBalance = rewardsToken.balanceOf(address(this)).sub(totalStaked);
+        uint freeBalance = rewardsToken.balanceOf(address(this)).sub(_totalSupply);
         rewardRate = freeBalance.div(rewardsDuration).sub(1);
         require(rewardRate <= freeBalance.div(rewardsDuration), "Provided reward too high");
 
