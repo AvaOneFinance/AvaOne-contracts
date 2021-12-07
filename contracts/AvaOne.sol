@@ -709,15 +709,9 @@ pragma solidity 0.6.12;
 
 // AvaOne with Governance.
 contract AvaOne is ERC20("AvaOne", "AVAO"), Ownable {
-    /// @notice Total number of tokens
-    uint256 public maxSupply = 100_000_000e18; // 100 million AvaOne
 
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterAvao).
     function mint(address _to, uint256 _amount) public onlyOwner {
-        require(
-            totalSupply().add(_amount) <= maxSupply,
-            "AVAO::mint: cannot exceed max supply"
-        );
         _mint(_to, _amount);
         _moveDelegates(address(0), _delegates[_to], _amount);
     }
