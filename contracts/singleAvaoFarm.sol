@@ -77,7 +77,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function stake(uint256 amount) external nonReentrant notPaused updateReward(msg.sender) {
-        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+        require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
@@ -87,7 +87,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     }
 
     function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
-        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+        require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
@@ -113,7 +113,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
 
     function addRewardToPool(uint256 reward) external updateReward(address(0)) {
         require(reward > 0, "Cannot add 0 to reward");
-        avao.safeTransferFrom(address(msg.sender), address(this), reward);
+        avao.safeTransferFrom(msg.sender, address(this), reward);
         uint256 remaining = periodFinish.sub(block.timestamp);
         uint256 leftover = remaining.mul(rewardRate);
         uint256 newReward = leftover.add(reward);
