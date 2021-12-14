@@ -134,12 +134,12 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     }
 
     // Add a contract address to whitelist
-    function addToWhitelist(address _address) public onlyOwner {
+    function addToWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = true;
     }
 
     // Remove a contract address from whitelist
-    function removeFromWhitelist(address _address) public onlyOwner {
+    function removeFromWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = false;
     }
 
