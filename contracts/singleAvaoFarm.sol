@@ -27,8 +27,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
 
     /* ========== STATE VARIABLES ========== */
 
-    IERC20 public rewardsToken; // AVAO
-    IERC20 public stakingToken; // AVAO
+    IERC20 public avao; // AVAO
     uint256 public periodFinish = 0;  // Timestamp limit for staking rewards
     uint256 public rewardRate = 0;  // How many tokens will be distributed during rewards duration
     uint256 public rewardsDuration = 7 days;  // Time interval during which rewards will be distributed
@@ -47,11 +46,9 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
 
     constructor(
         address _owner,
-        address _rewardsToken,
-        address _stakingToken
+        IERC20 _avao
     ) public Owned(_owner) {
-        rewardsToken = IERC20(_rewardsToken);
-        stakingToken = IERC20(_stakingToken);
+        avao = _avao;
     }
 
     /* ========== VIEWS ========== */
@@ -85,7 +82,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
+        avao.safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -95,7 +92,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        stakingToken.safeTransfer(msg.sender, amount);
+        avao.safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -103,7 +100,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            rewardsToken.safeTransfer(msg.sender, reward);
+            avao.safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
     }
@@ -116,7 +113,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
 
     function addRewardToPool(uint256 reward) external updateReward(address(0)) {
         require(reward > 0, "Cannot add 0 to reward");
-        rewardsToken.safeTransferFrom(address(msg.sender), address(this), reward);
+        avao.safeTransferFrom(address(msg.sender), address(this), reward);
         uint256 remaining = periodFinish.sub(block.timestamp);
         uint256 leftover = remaining.mul(rewardRate);
         uint256 newReward = leftover.add(reward);
@@ -131,7 +128,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+        require(tokenAddress != address(avao), "Cannot withdraw the staking token");
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
