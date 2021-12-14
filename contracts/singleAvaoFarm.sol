@@ -136,11 +136,13 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     // Add a contract address to whitelist
     function addToWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = true;
+        emit AddToWhitelist(_address);
     }
 
     // Remove a contract address from whitelist
     function removeFromWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = false;
+        emit RemoveFromWhitelist(_address);
     }
 
 
@@ -165,5 +167,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     event RewardPaid(address indexed user, uint256 reward);
     event RewardsDurationUpdated(uint256 newDuration);
     event Recovered(address token, uint256 amount);
+    event AddToWhitelist(address _address);
+    event RemoveFromWhitelist(address _address);
 }
 
