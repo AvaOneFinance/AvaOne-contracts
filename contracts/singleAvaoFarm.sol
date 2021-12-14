@@ -117,9 +117,11 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     function addRewardToPool(uint256 reward) external updateReward(address(0)) {
         require(reward > 0, "Cannot add 0 to reward");
         rewardsToken.safeTransferFrom(address(msg.sender), address(this), reward);
-        uint freeBalance = rewardsToken.balanceOf(address(this)).sub(_totalSupply);
-        rewardRate = freeBalance.div(rewardsDuration).sub(1);
-        require(rewardRate <= freeBalance.div(rewardsDuration), "Provided reward too high");
+        uint256 remaining = periodFinish.sub(block.timestamp);
+        uint256 leftover = remaining.mul(rewardRate);
+        uint256 newReward = leftover.add(reward);
+        rewardRate = newReward.div(rewardsDuration).sub(1);
+        require(rewardRate <= newReward.div(rewardsDuration), "Provided reward too high");
 
         lastUpdateTime = block.timestamp;
         periodFinish = block.timestamp.add(rewardsDuration);
