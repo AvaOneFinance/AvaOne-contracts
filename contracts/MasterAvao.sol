@@ -1832,6 +1832,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             0 <= _devPercent && _devPercent <= 1000,
             "constructor: invalid dev percent value"
         );
+        require(_devAddr != address(0), "constructor: _devAddr cannot be address(0)");
         avao = _avao;
         devAddr = _devAddr;
         avaoPerSec = _avaoPerSec;
@@ -2110,6 +2111,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     // Update dev address by the previous dev.
     function dev(address _devAddr) public {
         require(msg.sender == devAddr, "dev: wut?");
+        require(_devAddr != address(0), "dev: address 0 not allowed");
         devAddr = _devAddr;
         emit SetDevAddress(msg.sender, _devAddr);
     }
