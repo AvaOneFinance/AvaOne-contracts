@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -202,10 +204,6 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         uint256 rewardFor24H = joePerSec.mul(86400).mul(poolAllocPoint).div(totalAllocPoint).mul(proxyLpAmount).div(poolLpAmount);
         return rewardFor24H;
     }
-
-    function setRouting(address[] calldata routing) public onlyOwner {
-        uniswapRouting = routing;    
-    } 
 
     // Change the percentages for how much is kept on the Contract
     // And how much is burning when buyback() is called
