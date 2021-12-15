@@ -13,12 +13,14 @@ contract Owned {
     }
 
     function nominateNewOwner(address _owner) external onlyOwner {
+        require(_owner != address(0), "Owned: owner cannot be 0");
         nominatedOwner = _owner;
         emit OwnerNominated(_owner);
     }
 
     function acceptOwnership() external {
         require(msg.sender == nominatedOwner, "You must be nominated before you can accept ownership");
+        require(nominatedOwner != address(0), "Owned: owner cannot be 0");
         emit OwnerChanged(owner, nominatedOwner);
         owner = nominatedOwner;
         nominatedOwner = address(0);
