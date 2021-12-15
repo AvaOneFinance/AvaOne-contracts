@@ -207,7 +207,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
 
     // Change the percentages for how much is kept on the Contract
     // And how much is burning when buyback() is called
-    function setBuybackAndBurn(uint256 _buyback, uint256 _burn) public onlyOwner {
+    function setBuybackAndBurn(uint256 _buyback, uint256 _burn) external onlyOwner {
         require (_buyback < 1000, "Cannot set higher than 100%");
         require (_burn < 1000, "Cannot set higher than 100%");
         buybackPercentage = _buyback;
@@ -220,7 +220,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     // Sell all remaining rewardTokens from the target pool for AVAO'safe
     // Then burn the _burn percetange of the AVAO tokens
     // And send the remaining balance to the single staking AVAO pool.
-    function buyback() public {
+    function buyback() external {
         require(rewardToken.balanceOf(address(this)) > 0, "Cannot buyback 0");
         uint256 rewardTokenBalance = rewardToken.balanceOf(address(this));
         if (rewardTokenBalance >= rewardToken.allowance(address(this), address(uniswapRouter))) {
@@ -256,7 +256,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     // Which then users will be able to recover their balances by calling emergencyWithdraw directly.
     // If a user wants to emergencyWithdraw from the master contract
     // and !emergencied, it will simply withdraw for that user.
-    function enableEmergency() public onlyOwner {
+    function enableEmergency() external onlyOwner {
         emergencied = true;
         targetPool.emergencyWithdraw(targetPoolId);
         uint256 balance = depositToken.balanceOf(address(this));
