@@ -17,6 +17,17 @@ contract SimpleSplitter {
     address public immutable hashercat;
     address public immutable saito;
 
+    event SplitBalanceBetweenAddress(
+        address _okinaPrime,
+        uint256 _okinaPrimeSplit,
+        address _satoku,
+        uint256 _satokuSplit,
+        address _hashercat,
+        uint256 _hashercatSplit,
+        address _saito,
+        uint256 _saitoSplit
+    );
+
    constructor(
         IERC20 _avaone,
         address _okinaPrime,
@@ -42,6 +53,17 @@ contract SimpleSplitter {
         // 30% for hashercat
         avaone.safeTransfer(hashercat, thirtyPercent);
         // Remaining (10%) for saito
-        avaone.safeTransfer(saito, avaone.balanceOf(address(this)));
+        uint256 saitoSplit = avaone.balanceOf(address(this));
+        avaone.safeTransfer(saito, saitoSplit);
+        emit SplitBalanceBetweenAddress(
+            okinaPrime,
+            thirtyPercent,
+            satoku,
+            thirtyPercent,
+            hashercat,
+            thirtyPercent,
+            saito,
+            saitoSplit
+        );
     }
 }
