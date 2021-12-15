@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -84,18 +85,18 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     
     
-    IERC20 public depositToken;
-    IERC20 public rewardToken;
-    IERC20 public controller;
-    AvaOne public avaone;
+    IERC20 public immutable depositToken;
+    IERC20 public immutable rewardToken;
+    IERC20 public immutable controller;
+    AvaOne public immutable avaone;
     uint256 public buybackPercentage;
     uint256 public burnPercentage;
-    uint256 public targetPoolId;
-    IPangolinPool targetPool;
-    SingleAvaoPool singleAvaoPool;
-    IUniswapRouter public uniswapRouter;
+    uint256 public immutable targetPoolId;
+    IPangolinPool public immutable targetPool;
+    SingleAvaoPool public immutable singleAvaoPool;
+    IUniswapRouter public immutable uniswapRouter;
     address[] public uniswapRouting;
-    bool emergencied;
+    bool public emergencied;
     
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
@@ -193,13 +194,9 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         return rewardFor24H;
     }
 
-    function setRouting(address[] calldata routing) public onlyOwner {
-        uniswapRouting = routing;    
-    } 
-
     // Change the percentages for how much is kept on the Contract
     // And how much is burning when buyback() is called
-    function setBuybackAndBurn(uint256 _buyback, uint256 _burn) public onlyOwner {
+    function setBuybackAndBurn(uint256 _buyback, uint256 _burn) external onlyOwner {
         require (_buyback < 1000, "Cannot set higher than 100%");
         require (_burn < 1000, "Cannot set higher than 100%");
         buybackPercentage = _buyback;
