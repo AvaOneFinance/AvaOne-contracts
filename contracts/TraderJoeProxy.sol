@@ -96,16 +96,16 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     
     
-    IERC20 public depositToken;
-    IERC20 public rewardToken;
-    IERC20 public controller;
-    AvaOne public avaone;
+    IERC20 public immutable depositToken;
+    IERC20 public immutable rewardToken;
+    IERC20 public immutable controller;
+    AvaOne public immutable avaone;
     uint256 public buybackPercentage;
     uint256 public burnPercentage;
-    uint256 public targetPoolId;
-    traderJoePool public targetPool;
-    SingleAvaoPool public singleAvaoPool;
-    IUniswapRouter public uniswapRouter;
+    uint256 public immutable targetPoolId;
+    traderJoePool public immutable targetPool;
+    SingleAvaoPool public immutable singleAvaoPool;
+    IUniswapRouter public immutable uniswapRouter;
     address[] public uniswapRouting;
     bool public emergencied;
     
