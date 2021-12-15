@@ -1782,6 +1782,8 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     uint256 public devPercent;
     // Whitelisted contracts that are able to interact with this contract
     mapping(address => bool) public whitelisted;
+    // Max amount that can be set as rewards per second, 25 AVAO/s
+    uint256 public immutable MAX_EMISSION_RATE = 25000000000000000000;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -2141,6 +2143,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     // Pancake has to add hidden dummy pools inorder to alter the emission,
     // here we make it simple and transparent to all.
     function updateEmissionRate(uint256 _avaoPerSec) public onlyOwner {
+        require (_avaoPerSec <= MAX_EMISSION_RATE, "emission: Too high");
         massUpdatePools();
         avaoPerSec = _avaoPerSec;
         emit UpdateEmissionRate(msg.sender, _avaoPerSec);
