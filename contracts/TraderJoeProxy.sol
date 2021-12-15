@@ -103,11 +103,11 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     uint256 public buybackPercentage;
     uint256 public burnPercentage;
     uint256 public targetPoolId;
-    traderJoePool targetPool;
-    SingleAvaoPool singleAvaoPool;
+    traderJoePool public targetPool;
+    SingleAvaoPool public singleAvaoPool;
     IUniswapRouter public uniswapRouter;
     address[] public uniswapRouting;
-    bool emergencied;
+    bool public emergencied;
     
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
