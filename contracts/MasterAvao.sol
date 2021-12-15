@@ -1784,6 +1784,8 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     mapping(address => bool) public whitelisted;
     // Max amount that can be set as rewards per second, 25 AVAO/s
     uint256 public immutable MAX_EMISSION_RATE = 25000000000000000000;
+    // Mac amount that can be set as devfee, 50%
+    uint256 public immutable MAX_DEVFEE = 500;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -1835,6 +1837,8 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             "constructor: invalid dev percent value"
         );
         require(_devAddr != address(0), "constructor: _devAddr cannot be address(0)");
+        require(_devPercent <= 500, "constructor: _devPercent cannot be higher than 50%");
+        // MAX_DEVFEE cannot be used as immutable varialbes cannot be read during contract creation time.
         avao = _avao;
         devAddr = _devAddr;
         avaoPerSec = _avaoPerSec;
@@ -2120,11 +2124,11 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
 
     function setDevPercent(uint256 _newDevPercent) public onlyOwner {
         require(
-            0 <= _newDevPercent && _newDevPercent <= 1000,
+            0 <= _newDevPercent && _newDevPercent <= MAX_DEVFEE,
             "setDevPercent: invalid percent value"
         );
         require(
-            _newDevPercent  <= 1000,
+            _newDevPercent  <= MAX_DEVFEE,
             "setDevPercent: total percent over max"
         );
         devPercent = _newDevPercent;
