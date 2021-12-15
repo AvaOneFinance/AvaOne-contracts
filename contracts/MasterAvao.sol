@@ -1824,6 +1824,9 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     );
     event SetDevAddress(address indexed oldAddress, address indexed newAddress);
     event UpdateEmissionRate(address indexed user, uint256 _avaoPerSec);
+    event SetDevPercent(uint256 percent);
+    event AddToWhitelist(address _address);
+    event RemoveFromWhitelist(address _address);
 
     constructor(
         AvaOne _avao,
@@ -2130,16 +2133,19 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             "setDevPercent: invalid percent value"
         );
         devPercent = _newDevPercent;
+        emit SetDevPercent(devPercent);
     }
 
     // Add a contract address to whitelist
     function addToWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = true;
+        emit AddToWhitelist(_address);
     }
 
     // Remove a contract address from whitelist
     function removeFromWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = false;
+        emit RemoveFromWhitelist(_address);
     }
 
     // Pancake has to add hidden dummy pools inorder to alter the emission,
