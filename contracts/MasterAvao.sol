@@ -1773,7 +1773,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // The AVAO TOKEN!
-    AvaOne public avao;
+    AvaOne public immutable avao;
     // Dev address.
     address public devAddr;
     // AVAO tokens created per second.
