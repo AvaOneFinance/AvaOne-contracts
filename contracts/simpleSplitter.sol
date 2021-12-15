@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -10,10 +12,10 @@ contract SimpleSplitter {
     using SafeERC20 for IERC20;
 
     IERC20 avaone; // The AvaOne token
-    address okinaPrime;
-    address satoku;
-    address hashercat;
-    address saito;
+    address public okinaPrime;
+    address public satoku;
+    address public hashercat;
+    address public saito;
 
    constructor(
         IERC20 _avaone,
