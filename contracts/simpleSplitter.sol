@@ -12,10 +12,10 @@ contract SimpleSplitter {
     using SafeERC20 for IERC20;
 
     IERC20 avaone; // The AvaOne token
-    address public okinaPrime;
-    address public satoku;
-    address public hashercat;
-    address public saito;
+    address public immutable okinaPrime;
+    address public immutable satoku;
+    address public immutable hashercat;
+    address public immutable saito;
 
    constructor(
         IERC20 _avaone,
