@@ -1766,8 +1766,8 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         IERC20 lpToken; // Address of LP token contract.
         uint256 allocPoint; // How many allocation points assigned to this pool. AVAOs to distribute per second.
         uint256 lastRewardTimestamp; // Last timestamp that AVAOs distribution occurs.
-        uint256 accAvaoPerShare; // Accumulated AVAOs per share, times 1e12. See below.
-        uint256 accProxyPerShare; // Accumulated Proxy tokens per share, timer 1e12. See below
+        uint256 accAvaoPerShare; // Accumulated AVAOs per share, times 1e18. See below.
+        uint256 accProxyPerShare; // Accumulated Proxy tokens per share, timer 1e18. See below
         uint256 lpSupply; // Total LP deposited through this contract
         IDepositProxy proxy;
     }
@@ -1924,10 +1924,10 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             .mul(lpPercent)
             .div(1000);
             accAvaoPerShare = accAvaoPerShare.add(
-                avaoReward.mul(1e12).div(pool.lpSupply)
+                avaoReward.mul(1e18).div(pool.lpSupply)
             );
         }
-        pendingAvao = user.amount.mul(accAvaoPerShare).div(1e12).sub(
+        pendingAvao = user.amount.mul(accAvaoPerShare).div(1e18).sub(
             user.rewardDebt
         );
 
@@ -1936,9 +1936,9 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             bonusTokenAddress = pool.proxy.rewardToken();
             uint256 accProxyPerShare = pool.accProxyPerShare;
             accProxyPerShare = accProxyPerShare.add(
-                pool.proxy.pendingRewards().mul(1e12).div(pool.lpSupply)
+                pool.proxy.pendingRewards().mul(1e18).div(pool.lpSupply)
                 );
-            pendingBonusToken = user.amount.mul(accProxyPerShare).div(1e12).sub(user.proxyRewardDebt);
+            pendingBonusToken = user.amount.mul(accProxyPerShare).div(1e18).sub(user.proxyRewardDebt);
         }
     }
 
@@ -1994,13 +1994,13 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         avao.mint(devAddr, avaoReward.mul(devPercent).div(1000));
         avao.mint(address(this), avaoReward.mul(lpPercent).div(1000));
         pool.accAvaoPerShare = pool.accAvaoPerShare.add(
-            avaoReward.mul(1e12).div(pool.lpSupply).mul(lpPercent).div(1000)
+            avaoReward.mul(1e18).div(pool.lpSupply).mul(lpPercent).div(1000)
         );
         
         if (address(pool.proxy) != address(0)) {
             uint256 proxyReward = pool.proxy.getReward();
             pool.accProxyPerShare = pool.accProxyPerShare.add(
-              proxyReward.mul(1e12).div(pool.lpSupply)
+              proxyReward.mul(1e18).div(pool.lpSupply)
             );
         }
         pool.lastRewardTimestamp = block.timestamp;
@@ -2024,7 +2024,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             uint256 pending = user
             .amount
             .mul(pool.accAvaoPerShare)
-            .div(1e12)
+            .div(1e18)
             .sub(user.rewardDebt);
             safeAvaoTransfer(msg.sender, pending);
             emit Harvest(msg.sender, _pid, pending);
@@ -2033,15 +2033,15 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
                 uint256 pendingProxy = user
                 .amount
                 .mul(pool.accProxyPerShare)
-                .div(1e12)
+                .div(1e18)
                 .sub(user.proxyRewardDebt);
                 
                 IERC20(pool.proxy.rewardToken()).safeTransfer(msg.sender, pendingProxy);
             }
         }
         user.amount = user.amount.add(_amount);
-        user.rewardDebt = user.amount.mul(pool.accAvaoPerShare).div(1e12);
-        user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accAvaoPerShare).div(1e18);
+        user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e18);
 
         pool.lpToken.safeTransferFrom(
             msg.sender,
@@ -2069,7 +2069,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         updatePool(_pid);
 
         // Harvest AVAO
-        uint256 pending = user.amount.mul(pool.accAvaoPerShare).div(1e12).sub(
+        uint256 pending = user.amount.mul(pool.accAvaoPerShare).div(1e18).sub(
             user.rewardDebt
         );
         safeAvaoTransfer(msg.sender, pending);
@@ -2077,13 +2077,13 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
 
         // Harvest proxy contract
         if (address(pool.proxy) != address(0)) {
-            uint256 pendingProxy = user.amount.mul(pool.accProxyPerShare).div(1e12).sub(user.proxyRewardDebt);
+            uint256 pendingProxy = user.amount.mul(pool.accProxyPerShare).div(1e18).sub(user.proxyRewardDebt);
             IERC20(pool.proxy.rewardToken()).safeTransfer(msg.sender, pendingProxy);
         }
 
         user.amount = user.amount.sub(_amount);
-        user.rewardDebt = user.amount.mul(pool.accAvaoPerShare).div(1e12);
-        user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accAvaoPerShare).div(1e18);
+        user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e18);
 
         if (address(pool.proxy) != address(0)) {
             pool.proxy.withdraw(_amount);
