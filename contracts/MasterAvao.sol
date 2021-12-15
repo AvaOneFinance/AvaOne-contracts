@@ -2129,10 +2129,6 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             0 <= _newDevPercent && _newDevPercent <= MAX_DEVFEE,
             "setDevPercent: invalid percent value"
         );
-        require(
-            _newDevPercent  <= MAX_DEVFEE,
-            "setDevPercent: total percent over max"
-        );
         devPercent = _newDevPercent;
     }
 
