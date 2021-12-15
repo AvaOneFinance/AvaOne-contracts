@@ -2093,9 +2093,10 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     function emergencyWithdraw(uint256 _pid) public nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        if (address(pool.proxy) != address(0)) {
-            require (pool.proxy.emergencied(), "Emergency on proxy was not enabled, withdraw normally instead");
-        } 
+        // Use normal withdraw from the proxy is the underlying proxy was not emergencied.
+        if (!pool.proxy.emergencied()) {
+            pool.proxy.withdraw(user.amount);
+        }
         pool.lpToken.safeTransfer(address(msg.sender), user.amount);
         pool.lpSupply = pool.lpSupply.sub(user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
