@@ -1797,6 +1797,7 @@ contract MasterChefAvaoV2 is Ownable {
         IDepositProxy _proxy
     ) public onlyOwner {
         require(!lpTokens.contains(address(_lpToken)), "add: LP already added");
+        require(address(_proxy) != address(0), "add: proxy is required");
         massUpdatePools();
         uint256 lastRewardTimestamp = block.timestamp > startTimestamp
             ? block.timestamp
