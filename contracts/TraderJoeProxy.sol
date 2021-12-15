@@ -156,7 +156,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     // Before calling deposit, the controller sends us a transaction
     // Containing the deposit token.
     // So we need to deposit all this contract depositToken balance to the target pool.
-    function deposit() external controllerOnly returns (uint256) {
+    function deposit() external controllerOnly {
         require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
         uint256 balance = depositToken.balanceOf(address(this));
         uint256 approval = depositToken.allowance(address(this), address(targetPool));
@@ -166,17 +166,15 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         }
         targetPool.deposit(targetPoolId, balance);
         emit Deposit(balance);
-        return balance;
     }
     
     // Withdraw from target pool and send back to the controller.
     // The controller handles the user balance, and it will send to him accordingly
-    function withdraw(uint256 _amount) external controllerOnly returns (uint256) {
+    function withdraw(uint256 _amount) external controllerOnly {
         require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
         targetPool.withdraw(targetPoolId, _amount);
         depositToken.safeTransfer(address(controller), _amount);
         emit Withdraw(_amount);
-        return _amount;
     }
     
     // Simple function to send the rewards from the targetPool back to the controller.
