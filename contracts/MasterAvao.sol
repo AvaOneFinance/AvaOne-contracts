@@ -1909,7 +1909,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 accAvaoPerShare = pool.accAvaoPerShare;
-        if (block.timestamp > pool.lastRewardTimestamp && pool.lpSupply != 0) {
+        if (block.timestamp > pool.lastRewardTimestamp && pool.lpSupply != 0 && totalAllocPoint > 0) {
             uint256 multiplier = block.timestamp.sub(pool.lastRewardTimestamp);
             uint256 lpPercent = 1000 -
                 devPercent;
