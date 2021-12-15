@@ -1858,7 +1858,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         uint256 _allocPoint,
         IERC20 _lpToken,
         IDepositProxy _proxy
-    ) public onlyOwner {
+    ) external onlyOwner {
         require(!lpTokens.contains(address(_lpToken)), "add: LP already added");
         require(address(_proxy) != address(0), "add: proxy is required");
         massUpdatePools();
@@ -1885,7 +1885,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     function set(
         uint256 _pid,
         uint256 _allocPoint
-    ) public onlyOwner {
+    ) external onlyOwner {
         massUpdatePools();
         totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(
             _allocPoint
@@ -1941,7 +1941,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
 
     // Get bonus token info from the rewarder contract for a given pool, if it is a double reward farm
     function rewarderBonusTokenInfo(uint256 _pid)
-        public
+        external
         view
         returns (address bonusTokenAddress, string memory bonusTokenSymbol)
     {
@@ -2010,7 +2010,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // Deposit LP tokens to MasterChef for AVAO allocation.
-    function deposit(uint256 _pid, uint256 _amount) public nonReentrant {
+    function deposit(uint256 _pid, uint256 _amount) external nonReentrant {
         require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
         PoolInfo storage pool = poolInfo[_pid];
@@ -2056,7 +2056,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // Withdraw LP tokens from MasterChef.
-    function withdraw(uint256 _pid, uint256 _amount) public nonReentrant {
+    function withdraw(uint256 _pid, uint256 _amount) external nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
@@ -2091,7 +2091,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // Withdraw without caring about rewards. EMERGENCY ONLY.
-    function emergencyWithdraw(uint256 _pid) public nonReentrant {
+    function emergencyWithdraw(uint256 _pid) external nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         // Use normal withdraw from the proxy is the underlying proxy was not emergencied.
@@ -2117,14 +2117,14 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // Update dev address by the previous dev.
-    function dev(address _devAddr) public {
+    function dev(address _devAddr) external {
         require(msg.sender == devAddr, "dev: wut?");
         require(_devAddr != address(0), "dev: address 0 not allowed");
         devAddr = _devAddr;
         emit SetDevAddress(msg.sender, _devAddr);
     }
 
-    function setDevPercent(uint256 _newDevPercent) public onlyOwner {
+    function setDevPercent(uint256 _newDevPercent) external onlyOwner {
         require(
             0 <= _newDevPercent && _newDevPercent <= MAX_DEVFEE,
             "setDevPercent: invalid percent value"
@@ -2133,18 +2133,18 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     }
 
     // Add a contract address to whitelist
-    function addToWhitelist(address _address) public onlyOwner {
+    function addToWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = true;
     }
 
     // Remove a contract address from whitelist
-    function removeFromWhitelist(address _address) public onlyOwner {
+    function removeFromWhitelist(address _address) external onlyOwner {
         whitelisted[_address] = false;
     }
 
     // Pancake has to add hidden dummy pools inorder to alter the emission,
     // here we make it simple and transparent to all.
-    function updateEmissionRate(uint256 _avaoPerSec) public onlyOwner {
+    function updateEmissionRate(uint256 _avaoPerSec) external onlyOwner {
         require (_avaoPerSec <= MAX_EMISSION_RATE, "emission: Too high");
         massUpdatePools();
         avaoPerSec = _avaoPerSec;
