@@ -42,7 +42,7 @@ contract SimpleSplitter {
         saito = _saito;
     }
 
-    function splitBalanceBetweenAddress() public {
+    function splitBalanceBetweenAddress() external {
         require(avaone.balanceOf(address(this)) != 0, "Cannot split a balance of zero!");
         uint256 thirtyPercent = avaone.balanceOf(address(this)).mul(300).div(1000);
 
