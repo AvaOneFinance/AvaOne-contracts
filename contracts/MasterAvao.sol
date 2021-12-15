@@ -1920,8 +1920,8 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             uint256 avaoReward = multiplier
             .mul(avaoPerSec)
             .mul(pool.allocPoint)
-            .div(totalAllocPoint)
             .mul(lpPercent)
+            .div(totalAllocPoint)
             .div(1000);
             accAvaoPerShare = accAvaoPerShare.add(
                 avaoReward.mul(1e18).div(pool.lpSupply)
@@ -1994,7 +1994,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         avao.mint(devAddr, avaoReward.mul(devPercent).div(1000));
         avao.mint(address(this), avaoReward.mul(lpPercent).div(1000));
         pool.accAvaoPerShare = pool.accAvaoPerShare.add(
-            avaoReward.mul(1e18).div(pool.lpSupply).mul(lpPercent).div(1000)
+            avaoReward.mul(1e18).mul(lpPercent).div(pool.lpSupply).div(1000)
         );
         
         if (address(pool.proxy) != address(0)) {
