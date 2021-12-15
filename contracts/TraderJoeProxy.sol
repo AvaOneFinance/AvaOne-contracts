@@ -162,8 +162,8 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         uint256 balance = depositToken.balanceOf(address(this));
         uint256 approval = depositToken.allowance(address(this), address(targetPool));
         if (balance >= approval) {
-            depositToken.approve(address(targetPool), 2**256 -1);
-            emit Approve(2**256-1);
+            depositToken.approve(address(targetPool), type(uint256).max);
+            emit Approve(type(uint256).max);
         }
         targetPool.deposit(targetPoolId, balance);
         emit Deposit(balance);
@@ -223,7 +223,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         require(rewardToken.balanceOf(address(this)) > 0, "Cannot buyback 0");
         uint256 rewardTokenBalance = rewardToken.balanceOf(address(this));
         if (rewardTokenBalance >= rewardToken.allowance(address(this), address(uniswapRouter))) {
-            rewardToken.approve(address(uniswapRouter), 2**256 -1);
+            rewardToken.approve(address(uniswapRouter), type(uint256).max);
         }
         uniswapRouter.swapExactTokensForTokens(
             rewardTokenBalance,
@@ -241,7 +241,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         avaone.transfer(address(msg.sender), userReward);
         // Send remaining to the single staking contract.
         if (balance >= avaone.allowance(address(this), address(singleAvaoPool))) {
-            avaone.approve(address(singleAvaoPool), 2**256-1);
+            avaone.approve(address(singleAvaoPool), type(uint256).max);
         }
         singleAvaoPool.addRewardToPool(avaone.balanceOf(address(this)));
         emit Buyback(balance); 
