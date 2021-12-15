@@ -129,7 +129,8 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         uint256 _buybackPercentage,
         uint256 _burnPercentage
     ) {
-        require(buybackPercentage < 1000,"Buyback Percentage cannot be 100%");
+        require(buybackPercentage < 1000,"constructor: Buyback Percentage cannot be 100%");
+        require(address(_depositToken) != address(_rewardToken), "constructor: depositToken cannot be equal to rewardToken");
         depositToken = _depositToken;
         rewardToken = _rewardToken;
         controller = _controller;
