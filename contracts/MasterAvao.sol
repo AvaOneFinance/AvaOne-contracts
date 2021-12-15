@@ -2011,7 +2011,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
 
     // Deposit LP tokens to MasterChef for AVAO allocation.
     function deposit(uint256 _pid, uint256 _amount) public nonReentrant {
-        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+        require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
@@ -2041,7 +2041,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e12);
 
         pool.lpToken.safeTransferFrom(
-            address(msg.sender),
+            msg.sender,
             address(this),
             _amount
         );
@@ -2060,7 +2060,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
-        require (address(msg.sender) == address(tx.origin) || whitelisted[address(msg.sender)],
+        require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
 
         updatePool(_pid);
@@ -2085,7 +2085,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         if (address(pool.proxy) != address(0)) {
             pool.proxy.withdraw(_amount);
         }
-        pool.lpToken.safeTransfer(address(msg.sender), _amount);
+        pool.lpToken.safeTransfer(msg.sender, _amount);
         pool.lpSupply = pool.lpSupply.sub(_amount);
         emit Withdraw(msg.sender, _pid, _amount);
     }
@@ -2098,7 +2098,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         if (!pool.proxy.emergencied()) {
             pool.proxy.withdraw(user.amount);
         }
-        pool.lpToken.safeTransfer(address(msg.sender), user.amount);
+        pool.lpToken.safeTransfer(msg.sender, user.amount);
         pool.lpSupply = pool.lpSupply.sub(user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
         user.amount = 0;
