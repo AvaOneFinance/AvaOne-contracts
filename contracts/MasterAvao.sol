@@ -2035,9 +2035,11 @@ contract MasterChefAvaoV2 is Ownable {
             require (pool.proxy.emergencied(), "Emergency on proxy was not enabled, withdraw normally instead");
         } 
         pool.lpToken.safeTransfer(address(msg.sender), user.amount);
+        pool.lpSupply = pool.lpSupply.sub(user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
         user.amount = 0;
         user.rewardDebt = 0;
+        user.proxyRewardDebt = 0;
     }
 
     // Safe avao transfer function, just in case if rounding error causes pool to not have enough AVAOs.
