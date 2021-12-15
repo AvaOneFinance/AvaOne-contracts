@@ -241,7 +241,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         uint256 userReward = avaone.balanceOf(address(this)).div(100);
         avaone.transfer(address(msg.sender), userReward);
         // Send remaining to the single staking contract.
-        if (balance > avaone.allowance(address(this), address(singleAvaoPool))) {
+        if (balance >= avaone.allowance(address(this), address(singleAvaoPool))) {
             avaone.approve(address(singleAvaoPool), 2**256-1);
         }
         singleAvaoPool.addRewardToPool(avaone.balanceOf(address(this)));
