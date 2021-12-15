@@ -1853,6 +1853,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
 
     // Add a new lp to the pool. Can only be called by the owner.
     // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+    // XXX DO NOT add reflection tokens, this contract DOES NOT support it otherwise it will cause severely malfunction with such tokens.
     function add(
         uint256 _allocPoint,
         IERC20 _lpToken,
