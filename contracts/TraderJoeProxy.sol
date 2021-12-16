@@ -197,7 +197,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         uint256 poolAllocPoint = targetPool.poolInfo(targetPoolId).allocPoint;
         uint256 totalAllocPoint = targetPool.totalAllocPoint();
         uint256 poolLpAmount = depositToken.balanceOf(address(targetPool));
-        if (poolLpAmount == 0 && totalAllocPoint == 0) { return 0; }
+        if (poolLpAmount == 0 || totalAllocPoint == 0) { return 0; }
         uint256 proxyLpAmount =  targetPool.userInfo(targetPoolId, address(this)).amount;
         uint256 joePerSec = targetPool.joePerSec();
         
