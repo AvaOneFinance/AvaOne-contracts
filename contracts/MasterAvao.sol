@@ -2097,10 +2097,16 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     function emergencyWithdraw(uint256 _pid) external nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        // Use normal withdraw from the proxy is the underlying proxy was not emergencied.
+        // Inside our proxy, it will check if it was emergencied or not.
+        // If it was, it will simple transfer the amount of the user directly to this contract
+        // which will then transfer the balance to the user.
+        // If it was **not** emergencied, we still need to call updatePool in order to
+        // Properly calculate rewards inside the proxy contract (by calling getRewards() on the proxy, inside the updatePool())
+        // as calling withdraw on the underlying targetPool, will trigger a harvest.
         if (!pool.proxy.emergencied()) {
-            pool.proxy.withdraw(user.amount);
+            updatePool(_pid);
         }
+        pool.proxy.withdraw(user.amount);
         pool.lpToken.safeTransfer(msg.sender, user.amount);
         pool.lpSupply = pool.lpSupply.sub(user.amount);
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);

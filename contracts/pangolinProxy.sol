@@ -162,8 +162,10 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     // Withdraw from target pool and send back to the controller.
     // The controller handles the user balance, and it will send to him accordingly
     function withdraw(uint256 _amount) external controllerOnly returns (uint256) {
-        require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
-        targetPool.withdraw(targetPoolId, _amount, address(this));
+        if (!emergencied) {
+            targetPool.withdraw(targetPoolId, _amount, address(this));
+        } // If the pool was emergencied, all the LP balance is locked inside this proxy contract
+          // So, simply transfer it to the controller, which will transfer to the user.
         depositToken.safeTransfer(address(controller), _amount);
         emit Withdraw(_amount);
         return _amount;
@@ -251,7 +253,6 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
         emergencied = true;
         targetPool.emergencyWithdraw(targetPoolId);
         uint256 balance = depositToken.balanceOf(address(this));
-        depositToken.safeTransfer(address(controller), balance);
         emit Emergency(balance);
     }
 }
