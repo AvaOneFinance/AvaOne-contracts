@@ -2062,6 +2062,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     function withdraw(uint256 _pid, uint256 _amount) external nonReentrant {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
+        require(!pool.proxy.emergencied(), "withdraw: emergency was enable under the proxy, call emergencyWithdraw instead");
         require(user.amount >= _amount, "withdraw: not good");
         require (msg.sender == tx.origin || whitelisted[msg.sender],
                 "Sender is a contract and it is not allowed to interact with this contract");
