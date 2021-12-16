@@ -114,9 +114,14 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     function addRewardToPool(uint256 reward) external updateReward(address(0)) {
         require(reward > 0, "Cannot add 0 to reward");
         avao.safeTransferFrom(msg.sender, address(this), reward);
-        uint256 remaining = periodFinish.sub(block.timestamp);
-        uint256 leftover = remaining.mul(rewardRate);
-        uint256 newReward = leftover.add(reward);
+        uint256 newReward = 0;
+        if (block.timestamp > periodFinish) {
+            newReward = reward;
+        } else {
+            uint256 remaining = periodFinish.sub(block.timestamp);
+            uint256 leftover = remaining.mul(rewardRate);
+            newReward = leftover.add(reward);
+        }
         rewardRate = newReward.div(rewardsDuration).sub(1);
         require(rewardRate <= newReward.div(rewardsDuration), "Provided reward too high");
 
