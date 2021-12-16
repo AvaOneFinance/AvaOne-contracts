@@ -80,7 +80,7 @@ interface IPangolinPool {
     function emergencyWithdraw(uint256 _pid) external;
 }
 
-contract TraderJoeProxy is Ownable, ReentrancyGuard {
+contract PangolinProxy is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     
