@@ -62,7 +62,6 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     // Withdraw from target pool and send back to the controller.
     // The controller handles the user balance, and it will send to him accordingly
     function withdraw(uint256 _amount) external controllerOnly {
-        require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
         depositToken.safeTransfer(address(controller), _amount);
         emit Withdraw(_amount);
     }
@@ -82,7 +81,6 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     function enableEmergency() public onlyOwner {
         emergencied = true;
         uint256 balance = depositToken.balanceOf(address(this));
-        depositToken.safeTransfer(address(controller), balance);
         emit Emergency(balance);
     }
 }
