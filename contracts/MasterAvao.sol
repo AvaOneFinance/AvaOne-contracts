@@ -1934,7 +1934,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         );
 
         // If it's a double reward farm, we return info about the bonus token
-        if (address(pool.proxy) != address(0)) {
+        if (pool.proxy.rewardToken() != address(0)) {
             bonusTokenAddress = pool.proxy.rewardToken();
             uint256 accProxyPerShare = pool.accProxyPerShare;
             accProxyPerShare = accProxyPerShare.add(
@@ -1951,7 +1951,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         returns (address bonusTokenAddress, string memory bonusTokenSymbol)
     {
         PoolInfo storage pool = poolInfo[_pid];
-        if (address(pool.proxy) != address(0)) {
+        if (pool.proxy.rewardToken() != address(0)) {
             bonusTokenAddress = address(pool.proxy.rewardToken());
             bonusTokenSymbol = IERC20(pool.proxy.rewardToken()).safeSymbol();
         }
@@ -1963,7 +1963,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         uint256 poolAllocPoint = pool.allocPoint;
         
         oneDayReward = avaoPerSec.mul(86400).mul(poolAllocPoint).div(totalAllocPoint);
-        if (address(pool.proxy) != address(0)) {
+        if (pool.proxy.rewardToken() != address(0)) {
             oneDayProxyReward = pool.proxy.get24HRewardForPool();
         }
     }
@@ -1999,7 +1999,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             avaoReward.mul(1e18).mul(lpPercent).div(pool.lpSupply).div(1000)
         );
         
-        if (address(pool.proxy) != address(0)) {
+        if (pool.proxy.rewardToken() != address(0)) {
             uint256 proxyReward = pool.proxy.getReward();
             pool.accProxyPerShare = pool.accProxyPerShare.add(
               proxyReward.mul(1e18).div(pool.lpSupply)
@@ -2031,7 +2031,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             safeAvaoTransfer(msg.sender, pending);
             emit Harvest(msg.sender, _pid, pending);
             // Harvest proxy contract
-            if (address(pool.proxy) != address(0)) {
+            if (pool.proxy.rewardToken() != address(0)) {
                 uint256 pendingProxy = user
                 .amount
                 .mul(pool.accProxyPerShare)
@@ -2050,12 +2050,9 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             address(this),
             _amount
         );
-        if (address(pool.proxy) != address(0)) {
-            pool.lpToken.safeTransfer(
-                address(pool.proxy),
-                _amount);
-            pool.proxy.deposit();
-        }
+        
+        pool.lpToken.safeTransfer(address(pool.proxy),_amount);
+        pool.proxy.deposit();
         pool.lpSupply = pool.lpSupply.add(_amount);
         emit Deposit(msg.sender, _pid, _amount);
     }
@@ -2079,7 +2076,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         emit Harvest(msg.sender, _pid, pending);
 
         // Harvest proxy contract
-        if (address(pool.proxy) != address(0)) {
+        if (pool.proxy.rewardToken() != address(0)) {
             uint256 pendingProxy = user.amount.mul(pool.accProxyPerShare).div(1e18).sub(user.proxyRewardDebt);
             IERC20(pool.proxy.rewardToken()).safeTransfer(msg.sender, pendingProxy);
         }
@@ -2088,9 +2085,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         user.rewardDebt = user.amount.mul(pool.accAvaoPerShare).div(1e18);
         user.proxyRewardDebt = user.amount.mul(pool.accProxyPerShare).div(1e18);
 
-        if (address(pool.proxy) != address(0)) {
-            pool.proxy.withdraw(_amount);
-        }
+        pool.proxy.withdraw(_amount);
         pool.lpToken.safeTransfer(msg.sender, _amount);
         pool.lpSupply = pool.lpSupply.sub(_amount);
         emit Withdraw(msg.sender, _pid, _amount);
