@@ -26,7 +26,7 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     IERC20 public depositToken;
     IERC20 public rewardToken;
     IERC20 public controller;
-    bool emergencied;
+    bool public emergencied;
     
     event Deposit();
     event Withdraw(uint256 _amount);
