@@ -23,9 +23,9 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    IERC20 public depositToken;
-    IERC20 public rewardToken;
-    IERC20 public controller;
+    IERC20 public immutable depositToken;
+    IERC20 public immutable rewardToken;
+    IERC20 public immutable controller;
     bool public emergencied;
     
     event Deposit();
@@ -39,7 +39,7 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     ) {
         depositToken = _depositToken;
         rewardToken = _rewardToken;
-        controller = _controller;
+        controller = _controller;   
     }
 
     modifier controllerOnly() {
