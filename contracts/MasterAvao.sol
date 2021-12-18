@@ -1722,6 +1722,7 @@ interface IDepositProxy {
     function withdraw(uint256 amount) external;
     function getReward() external returns (uint256);
     function rewardToken() external view returns (address);
+    function depositToken() external view returns (address);
     function emergencied() external view returns (bool);
     function get24HRewardForPool() external view returns (uint256); 
 }
@@ -1864,6 +1865,7 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
     ) external onlyOwner {
         require(!lpTokens.contains(address(_lpToken)), "add: LP already added");
         require(address(_proxy) != address(0), "add: proxy is required");
+        require(address(_lpToken) == _proxy.depositToken(), "add: proxy deposit token does not match _lpToken");
         massUpdatePools();
         uint256 lastRewardTimestamp = block.timestamp > startTimestamp
             ? block.timestamp
