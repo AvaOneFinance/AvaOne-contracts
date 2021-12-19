@@ -72,6 +72,7 @@ interface traderJoePool {
     
     function userInfo(uint256 _pid, address _user) external view returns (traderJoePool.UserInfo memory);
     function poolInfo(uint256 _pid) external view returns (traderJoePool.PoolInfo memory);
+    function joe() external view returns (address);
     function devPercent() external view returns (uint256);
     function treasuryPercent() external view returns (uint256);
     function investorPercent() external view returns (uint256);
@@ -131,6 +132,8 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     ) {
         require(buybackPercentage < 1000,"constructor: Buyback Percentage cannot be 100%");
         require(address(_depositToken) != address(_rewardToken), "constructor: depositToken cannot be equal to rewardToken");
+        require(_targetPool.joe() == address(_rewardToken), "constructor: reward token doesn't match target pool");
+        require(address(_targetPool.poolInfo(_targetPoolId).lpToken) == address(_depositToken), "constructor: deposit token doesn't match target pool");
         depositToken = _depositToken;
         rewardToken = _rewardToken;
         controller = _controller;

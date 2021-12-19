@@ -69,6 +69,7 @@ interface IPangolinPool {
     
     function userInfo(uint256 _pid, address _user) external view returns (IPangolinPool.UserInfo memory);
     function poolInfo(uint256 _pid) external view returns (IPangolinPool.PoolInfo memory);
+    function lpToken(uint256 _pid) external view returns (IERC20);
     function totalAllocPoint() external view returns (uint256);
     function rewardPerSecond() external view returns (uint256);
     function deposit(uint256 _pid, uint256 _amount, address to) external;
@@ -76,6 +77,7 @@ interface IPangolinPool {
     function pendingReward(uint256 _pid, address _user) external view returns (uint256 pending);
     function harvest(uint256 pid, address to) external; 
     function withdrawAndHarvest(uint256 pid, uint256 amount, address to) external;
+    function REWARD() external view returns (address);
 
     function emergencyWithdraw(uint256 _pid) external;
 }
@@ -120,6 +122,8 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     ) {
         require(buybackPercentage < 1000,"Buyback Percentage cannot be 100%");
         require(address(_depositToken) != address(_rewardToken), "constructor: depositToken cannot be equal to rewardToken");
+        require(_targetPool.REWARD() == address(_rewardToken), "constructor: reward token doesn't match target pool");
+        require(address(_targetPool.lpToken(_targetPoolId)) == address(_depositToken), "constructor: deposit token doesn't match target pool");
         depositToken = _depositToken;
         rewardToken = _rewardToken;
         controller = _controller;
