@@ -44,24 +44,24 @@ contract SimpleSplitter {
 
     function splitBalanceBetweenAddress() external {
         require(avaone.balanceOf(address(this)) != 0, "Cannot split a balance of zero!");
-        uint256 thirtyPercent = avaone.balanceOf(address(this)).mul(300).div(1000);
+        uint256 thirtyTwoPercent = avaone.balanceOf(address(this)).mul(320).div(1000);
 
-        // 30% for okina
-        avaone.safeTransfer(okinaPrime, thirtyPercent);
-        // 30% for satoku
-        avaone.safeTransfer(satoku, thirtyPercent);
-        // 30% for hashercat
-        avaone.safeTransfer(hashercat, thirtyPercent);
-        // Remaining (10%) for saito
+        // 32% for okina
+        avaone.safeTransfer(okinaPrime, thirtyTwoPercent);
+        // 32% for satoku
+        avaone.safeTransfer(satoku, thirtyTwoPercent);
+        // 32% for hashercat
+        avaone.safeTransfer(hashercat, thirtyTwoPercent);
+        // Remaining (4%) for saito
         uint256 saitoSplit = avaone.balanceOf(address(this));
         avaone.safeTransfer(saito, saitoSplit);
         emit SplitBalanceBetweenAddress(
             okinaPrime,
-            thirtyPercent,
+            thirtyTwoPercent,
             satoku,
-            thirtyPercent,
+            thirtyTwoPercent,
             hashercat,
-            thirtyPercent,
+            thirtyTwoPercent,
             saito,
             saitoSplit
         );
