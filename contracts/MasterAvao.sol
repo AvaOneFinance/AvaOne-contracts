@@ -2152,6 +2152,12 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
         emit RemoveFromWhitelist(_address);
     }
 
+    // Simple view function to allow our frontend to check if the proxy was emergencied.
+    function isEmergencied(uint256 _pid) external view returns (bool) {
+        PoolInfo memory pool = poolInfo[_pid];
+        return pool.proxy.emergencied();
+    }
+
     // Pancake has to add hidden dummy pools inorder to alter the emission,
     // here we make it simple and transparent to all.
     function updateEmissionRate(uint256 _avaoPerSec) external onlyOwner {
