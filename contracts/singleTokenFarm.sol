@@ -29,6 +29,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     /* ========== STATE VARIABLES ========== */
 
     IERC20 public avao; // AVAO
+    IERC20 public depositToken;
     uint256 public periodFinish = 0;  // Timestamp limit for staking rewards
     uint256 public rewardRate = 0;  // How many tokens will be distributed during rewards duration
     uint256 public rewardsDuration = 7 days;  // Time interval during which rewards will be distributed
@@ -47,9 +48,11 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
 
     constructor(
         address _owner,
-        IERC20 _avao
+        IERC20 _avao,
+        IERC20 _depositToken
     ) public Owned(_owner) {
         avao = _avao;
+        depositToken = _depositToken;
     }
 
     /* ========== VIEWS ========== */
@@ -83,7 +86,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        avao.safeTransferFrom(msg.sender, address(this), amount);
+        depositToken.safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -93,7 +96,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        avao.safeTransfer(msg.sender, amount);
+        depositToken.safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -134,7 +137,7 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     function recoverERC20(address tokenAddress, uint256 tokenAmount) external onlyOwner {
-        require(tokenAddress != address(avao), "Cannot withdraw the staking token");
+        require(tokenAddress != address(depositToken), "Cannot withdraw the staking token");
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
@@ -176,4 +179,3 @@ contract StakingPool is IStakingRewards, ReentrancyGuard, Pausable {
     event AddToWhitelist(address _address);
     event RemoveFromWhitelist(address _address);
 }
-
