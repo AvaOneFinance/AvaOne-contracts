@@ -70,7 +70,7 @@ interface lydiaPool {
     function emergencyWithdraw(uint256 _pid) external;
 }
 
-contract lydiaProxy is Ownable, ReentrancyGuard {
+contract lydiaSingleProxy is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     
@@ -247,4 +247,14 @@ contract lydiaProxy is Ownable, ReentrancyGuard {
         uint256 balance = lyd.balanceOf(address(this));
         emit Emergency(balance);
     }
+
+    // View only functions to match Interface over MasterAvao
+    function depositToken() external view returns (address) {
+        return address(lyd);
+    }
+
+    function rewardToken() external view returns (address) {
+        return address(lyd);
+    }
+
 }
