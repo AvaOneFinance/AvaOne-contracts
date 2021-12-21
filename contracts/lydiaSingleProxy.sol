@@ -168,8 +168,9 @@ contract lydiaSingleProxy is Ownable, ReentrancyGuard {
         uint256 previousBalance = lyd.balanceOf(address(this));
         targetPool.leaveStaking(0);
         uint256 balanceDifference = lyd.balanceOf(address(this)).sub(previousBalance);
-        buybackBalance.add(balanceDifference.mul(buybackPercentage).div(1000));
-        uint256 poolReward = balanceDifference.sub(buybackBalance);
+        uint256 buybackDifference = balanceDifference.mul(buybackPercentage).div(1000);
+        buybackBalance = buybackBalance.add(buybackDifference);
+        uint256 poolReward = balanceDifference.sub(buybackDifference);
         // Transfer all to the controller contract
         lyd.safeTransfer(address(controller), poolReward);
         return poolReward;
