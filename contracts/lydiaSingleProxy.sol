@@ -81,7 +81,7 @@ contract lydiaSingleProxy is Ownable, ReentrancyGuard {
     // This is mainly the only difference between the other proxies.
     // We keep the buyback balance on a variable instead of the balance of the contract itself.
     // because depositToken == rewardToken
-    uint256 buybackBalance;
+    uint256 public buybackBalance;
     uint256 public buybackPercentage;
     uint256 public burnPercentage;
     uint256 public immutable targetPoolId;
