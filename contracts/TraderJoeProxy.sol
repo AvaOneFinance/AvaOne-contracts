@@ -225,7 +225,7 @@ contract TraderJoeProxy is Ownable, ReentrancyGuard {
     // Sell all remaining rewardTokens from the target pool for AVAO'safe
     // Then burn the _burn percetange of the AVAO tokens
     // And send the remaining balance to the single staking AVAO pool.
-    function buyback() external {
+    function buyback() external nonReentrant {
         require(rewardToken.balanceOf(address(this)) > 0, "Cannot buyback 0");
         uint256 rewardTokenBalance = rewardToken.balanceOf(address(this));
         if (rewardTokenBalance >= rewardToken.allowance(address(this), address(uniswapRouter))) {

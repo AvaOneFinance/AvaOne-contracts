@@ -204,7 +204,7 @@ contract lydiaSingleProxy is Ownable, ReentrancyGuard {
     // Sell all remaining rewardTokens from the target pool for AVAO'safe
     // Then burn the _burn percetange of the AVAO tokens
     // And send the remaining balance to the single staking AVAO pool.
-    function buyback() external {
+    function buyback() external nonReentrant {
         require(buybackBalance > 0, "Cannot buyback 0");
         uint256 rewardTokenBalance = buybackBalance;
         if (rewardTokenBalance >= lyd.allowance(address(this), address(uniswapRouter))) {
