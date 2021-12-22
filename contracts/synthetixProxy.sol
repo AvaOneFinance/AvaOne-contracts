@@ -37,7 +37,7 @@ interface SingleAvaoPool {
 interface SynthetixPool {
     function totalSupply() external view returns (uint256);
     function rewardRate() external view returns (uint256);
-    function rewardToken() external view returns (address);
+    function rewardsToken() external view returns (address);
     function stakingToken() external view returns (address);
     function earned(address account) external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
@@ -84,7 +84,7 @@ contract SynthetixProxy is Ownable, ReentrancyGuard {
     ) {
         require(buybackPercentage < 1000,"constructor: Buyback Percentage cannot be 100%");
         require(address(_depositToken) != address(_rewardToken), "constructor: depositToken cannot be equal to rewardToken");
-        require(address(_targetPool.rewardToken()) == address(_rewardToken), "constructor: reward token doesn't match target pool");
+        require(address(_targetPool.rewardsToken()) == address(_rewardToken), "constructor: reward token doesn't match target pool");
         require(address(_targetPool.stakingToken()) == address(_depositToken), "constructor: deposit token doesn't match target pool");
         depositToken = _depositToken;
         rewardToken = _rewardToken;
