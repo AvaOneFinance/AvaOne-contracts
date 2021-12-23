@@ -1724,6 +1724,7 @@ interface IDepositProxy {
     function rewardToken() external view returns (address);
     function depositToken() external view returns (address);
     function emergencied() external view returns (bool);
+    function paused() external view returns (bool);
     function get24HRewardForPool() external view returns (uint256); 
 }
 
@@ -1983,6 +1984,11 @@ contract MasterChefAvaoV2 is Ownable, ReentrancyGuard {
             return;
         }
         
+        if (pool.proxy.emergencied() || pool.proxy.paused()) {
+            pool.lastRewardTimestamp = block.timestamp;
+            return;
+        }
+
         if (pool.lpSupply == 0) {
             pool.lastRewardTimestamp = block.timestamp;
             return;
