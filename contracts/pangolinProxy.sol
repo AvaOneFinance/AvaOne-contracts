@@ -98,7 +98,7 @@ interface IPangolinPool {
     function withdrawAndHarvest(uint256 pid, uint256 amount, address to) external;
     function REWARD() external view returns (address);
 
-    function emergencyWithdraw(uint256 _pid) external;
+    function emergencyWithdraw(uint256 _pid, address to) external;
 }
 
 contract PangolinProxy is Ownable, ReentrancyGuard {
@@ -291,7 +291,7 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     function enableEmergency() public onlyOwner {
         emergencied = true;
         paused = true;
-        targetPool.emergencyWithdraw(targetPoolId);
+        targetPool.emergencyWithdraw(targetPoolId, address(this));
         uint256 balance = depositToken.balanceOf(address(this));
         emit Emergency(balance);
         emit Paused(paused);
