@@ -26,7 +26,7 @@ contract AvaOneMigrator is Ownable, ReentrancyGuard {
     }
 
     function migrate(uint256 amount) external nonReentrant {
-        require (oldAvaOne.balanceOf(msg.sender) <= amount, "migrate: cannot migrate more than your balance");
+        require (oldAvaOne.balanceOf(msg.sender) >= amount, "migrate: cannot migrate more than your balance");
         oldAvaOne.transferFrom(msg.sender, address(this), amount);
         newAvaOne.transfer(msg.sender, amount);
         emit Migrated (amount);
