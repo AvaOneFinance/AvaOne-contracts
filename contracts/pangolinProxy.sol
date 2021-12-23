@@ -19,6 +19,25 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
     function rewardToken() external view returns (address);
 }*/
 
+interface WAVAX {
+    function name() external view returns (string memory);
+    function approve(address guy, uint256 wad) external returns (bool);
+    function totalSupply() external view returns (uint256);
+    function transferFrom(
+        address src,
+        address dst,
+        uint256 wad
+    ) external returns (bool);
+
+    function withdraw(uint256 wad) external;
+    function decimals() external view returns (uint8);
+    function balanceOf(address) external view returns (uint256);
+    function symbol() external view returns (string memory);
+    function transfer(address dst, uint256 wad) external returns (bool);
+    function deposit() external payable;
+    function allowance(address, address) external view returns (uint256);
+}
+
 interface IRewarder {
     function onJoeReward(address user, uint256 newLpAmount) external;
 
@@ -91,6 +110,7 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     IERC20 public immutable rewardToken;
     IERC20 public immutable controller;
     AvaOne public immutable avaone;
+    WAVAX public immutable wavax = WAVAX(0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7);
     uint256 public buybackPercentage;
     uint256 public burnPercentage;
     uint256 public immutable targetPoolId;
@@ -106,6 +126,7 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     event Buyback(uint256 amount);
     event BuybackAndBurn(uint256 buyback, uint256 burn);
     event Emergency(uint256 amount);
+    event Recovered(address token, uint256 amount);
     
     constructor(
         IERC20 _depositToken,
@@ -140,6 +161,15 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     modifier controllerOnly() {
         require(msg.sender == address(controller), "Account doesn't have controller privillege");
         _;
+    }
+
+    receive() external payable {}
+
+    function wrapWAVAX() private {
+        uint256 _avax = address(this).balance;
+        if (_avax > 0) {
+            WAVAX(wavax).deposit{value: _avax}();
+        }
     }
     
     function pendingRewards() external view returns (uint256) {
@@ -181,6 +211,7 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
     function getReward() external controllerOnly returns (uint256) {
         uint256 previousBalance = rewardToken.balanceOf(address(this));
         targetPool.harvest(targetPoolId, address(this));
+        wrapWAVAX();
         uint256 balanceDifference = rewardToken.balanceOf(address(this)).sub(previousBalance);
         uint256 buybackBalance = balanceDifference.mul(buybackPercentage).div(1000);
         uint256 poolReward = balanceDifference.sub(buybackBalance);
@@ -258,5 +289,15 @@ contract PangolinProxy is Ownable, ReentrancyGuard {
         targetPool.emergencyWithdraw(targetPoolId);
         uint256 balance = depositToken.balanceOf(address(this));
         emit Emergency(balance);
+    }
+
+    function recoverERC20(IERC20 _token) external onlyOwner nonReentrant {
+        require(address(_token) != address(depositToken), "recoverERC20: cannot withdraw the depositToken");
+        require(address(_token) != address(rewardToken), "recoverERC20: cannot withdraw the rewardToken");
+        uint256 tokenBalance = _token.balanceOf(address(this));
+        if (tokenBalance > 0) {
+            _token.safeTransfer(msg.sender, tokenBalance);
+            emit Recovered(address(_token), tokenBalance);
+        }
     }
 }
