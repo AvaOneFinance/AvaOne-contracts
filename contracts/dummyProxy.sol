@@ -27,10 +27,12 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     IERC20 public immutable rewardToken;
     IERC20 public immutable controller;
     bool public emergencied;
-    
+    bool public paused;
+
     event Deposit();
     event Withdraw(uint256 _amount);
     event Emergency(uint256 amount);
+    event Paused(bool status);
     
     constructor(
         IERC20 _depositToken,
@@ -55,6 +57,7 @@ contract dummyProxy is Ownable, ReentrancyGuard {
 
     // Dummy function to allow MasterAvao to call it and not revert.
     function deposit() external controllerOnly {
+        require (!paused, "Proxy is paused, cannot deposit");
         require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
         emit Deposit();
     }
@@ -69,6 +72,7 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     // Again, as this proxy is a dummmy proxy, it does not generate any reward, returns 0 to the controller.
     // Function declaration is kept the same so it does not revert when the controller calls it.
     function getReward() external controllerOnly returns (uint256) {
+        require (!paused, "Proxy is paused, cannot getReward");
         return 0;
     }
 
@@ -79,8 +83,16 @@ contract dummyProxy is Ownable, ReentrancyGuard {
     }
 
     function enableEmergency() public onlyOwner {
+        paused = true;
         emergencied = true;
         uint256 balance = depositToken.balanceOf(address(this));
         emit Emergency(balance);
+        emit Paused(paused);
+    }
+
+    function setPause(bool _paused) external onlyOwner {
+        require (!emergencied, "Cannot change pause status after emergency was enabled");
+        paused = _paused;
+        emit Paused(paused);
     }
 }

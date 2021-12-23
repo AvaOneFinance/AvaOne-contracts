@@ -66,6 +66,7 @@ contract PangolinSingleProxy is Ownable, ReentrancyGuard {
     IUniswapRouter public immutable uniswapRouter;
     address[] public uniswapRouting;
     bool public emergencied;
+    bool public paused;
     
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
@@ -73,6 +74,7 @@ contract PangolinSingleProxy is Ownable, ReentrancyGuard {
     event Buyback(uint256 amount);
     event BuybackAndBurn(uint256 buyback, uint256 burn);
     event Emergency(uint256 amount);
+    event Paused(bool status);
     
     constructor(
         IERC20 _depositToken,
@@ -116,6 +118,7 @@ contract PangolinSingleProxy is Ownable, ReentrancyGuard {
     // Containing the deposit token.
     // So we need to deposit all this contract depositToken balance to the target pool.
     function deposit() external controllerOnly nonReentrant {
+        require (!paused, "Proxy is paused, cannot deposit");
         require (!emergencied, "Emergency was enabled, withdraw your tokens instead");
         uint256 balance = depositToken.balanceOf(address(this)).sub(buybackBalance);
         uint256 approval = depositToken.allowance(address(this), address(targetPool));
@@ -150,6 +153,7 @@ contract PangolinSingleProxy is Ownable, ReentrancyGuard {
     // It keeps a balance in this contract that will be used when calling
     // buyback() in the future
     function getReward() external controllerOnly returns (uint256) {
+        require (!paused, "Proxy is paused, cannot getReward");
         uint256 previousBalance = rewardToken.balanceOf(address(this));
         targetPool.getReward();
         uint256 balanceDifference = rewardToken.balanceOf(address(this)).sub(previousBalance);
@@ -226,8 +230,15 @@ contract PangolinSingleProxy is Ownable, ReentrancyGuard {
     // and !emergencied, it will simply withdraw for that user.
     function enableEmergency() external onlyOwner {
         emergencied = true;
+        paused = true;
         targetPool.withdraw(targetPool.balanceOf(address(this)));
         uint256 balance = depositToken.balanceOf(address(this));
         emit Emergency(balance);
+        emit Paused(paused);
+    }
+    function setPause(bool _paused) external onlyOwner {
+        require (!emergencied, "Cannot change pause status after emergency was enabled");
+        paused = _paused;
+        emit Paused(paused);
     }
 }
